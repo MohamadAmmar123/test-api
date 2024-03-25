@@ -13,22 +13,22 @@ def status() -> str:
 
 @app.get("/backup")
 def backup():
-    return send_file("mnt/data.db")
+    return send_file("/data/data.db")
 
 
 @app.get("/bookings")
 @app.get("/bookings/<email>")
 def get_bookings(email=None):
-    with sqlite3.connect("mnt/data.db") as con:
+    with sqlite3.connect("/data/data.db") as con:
         try:
             cur: sqlite3.Cursor = con.cursor()
             result: sqlite3.Cursor = None
-            
+
             if email:
                 result = cur.execute("SELECT br.ID, r.NAME, t.NAME, t.PRICE, b.NAME, b.EMAIL, b.CHECKIN, b.CHECKOUT FROM BOOKED_ROOMS br INNER JOIN ROOMS r ON br.ROOM_ID = r.ID INNER JOIN ROOM_TYPE t ON r.ROOM_TYPE = t.ID INNER JOIN BOOKINGS b ON br.BOOKING_ID = b.ID WHERE b.EMAIL = ?;", (email,))
             else:
                 result = cur.execute("SELECT br.ID, r.NAME, t.NAME, t.PRICE, b.NAME, b.EMAIL, b.CHECKIN, b.CHECKOUT FROM BOOKED_ROOMS br INNER JOIN ROOMS r ON br.ROOM_ID = r.ID INNER JOIN ROOM_TYPE t ON r.ROOM_TYPE = t.ID INNER JOIN BOOKINGS b ON br.BOOKING_ID = b.ID;")
-            
+
             data: list[dict[str, Any]] = list(map(
                     lambda row: {
                         "id": row[0],
@@ -55,7 +55,7 @@ def get_bookings(email=None):
 
 @app.get("/rooms")
 def rooms() -> dict[str, Any]:
-    with sqlite3.connect("mnt/data.db") as con:
+    with sqlite3.connect("/data/data.db") as con:
         try:
             cur: sqlite3.Cursor = con.cursor()
             result: sqlite3.Cursor = cur.execute(
@@ -79,7 +79,7 @@ def rooms() -> dict[str, Any]:
                 "data": {},
                 "status": "ERROR - Execution failed."
             }
-    
+
 @app.post("/check")
 def check() -> dict[str, Any]:
     room_type: int = -1
@@ -100,7 +100,7 @@ def check() -> dict[str, Any]:
             "status": "ERROR - Not enough data."
         }
 
-    with sqlite3.connect("mnt/data.db") as con:
+    with sqlite3.connect("/data/data.db") as con:
         try:
             cur: sqlite3.Cursor = con.cursor()
             result: sqlite3.Cursor = cur.execute(
@@ -137,13 +137,13 @@ def check() -> dict[str, Any]:
                 is_available = "AVAILABLE"
             else:
                 is_available = "NOT AVAILABLE"
-            
+
             return {
                 "data": {
                     "available": is_available
                 }
             }
-        
+
         except Exception as err:
             print(err)
             return {
@@ -174,7 +174,7 @@ def book() -> dict[str, Any]:
             "status": "ERROR - Not enough data."
         }
 
-    with sqlite3.connect("mnt/data.db") as con:
+    with sqlite3.connect("/data/data.db") as con:
         try:
             cur: sqlite3.Cursor = con.cursor()
             vacant: sqlite3.Cursor = cur.execute(
@@ -247,7 +247,7 @@ def book() -> dict[str, Any]:
                     """,
                     booked_rooms
                 )
-                
+
                 con.commit()
 
                 price = 0
@@ -269,7 +269,7 @@ def book() -> dict[str, Any]:
                         "total": 0
                     }
                 }
-        
+
         except Exception as err:
             print(err)
             return {
