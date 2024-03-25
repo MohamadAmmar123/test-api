@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Any
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, send_file
 from flask_cors import CORS
 import sqlite3
 
@@ -10,6 +10,11 @@ CORS(app)
 @app.get("/")
 def status() -> str:
     return render_template('status.html')
+
+@app.get("/backup")
+def backup():
+    return send_file("mnt/data.db")
+
 
 @app.get("/bookings")
 @app.get("/bookings/<email>")

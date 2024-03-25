@@ -1,6 +1,5 @@
 # flyctl launch added from .gitignore
 **/.venv
 __pycache__
-mnt/*.db
 docs
 fly.toml
