@@ -11,9 +11,46 @@ CORS(app)
 def status() -> str:
     return render_template('status.html')
 
+@app.get("/bookings")
+@app.get("/bookings/<email>")
+def get_bookings(email=None):
+    with sqlite3.connect("mnt/data.db") as con:
+        try:
+            cur: sqlite3.Cursor = con.cursor()
+            result: sqlite3.Cursor = None
+            
+            if email:
+                result = cur.execute("SELECT br.ID, r.NAME, t.NAME, t.PRICE, b.NAME, b.EMAIL, b.CHECKIN, b.CHECKOUT FROM BOOKED_ROOMS br INNER JOIN ROOMS r ON br.ROOM_ID = r.ID INNER JOIN ROOM_TYPE t ON r.ROOM_TYPE = t.ID INNER JOIN BOOKINGS b ON br.BOOKING_ID = b.ID WHERE b.EMAIL = ?;", (email,))
+            else:
+                result = cur.execute("SELECT br.ID, r.NAME, t.NAME, t.PRICE, b.NAME, b.EMAIL, b.CHECKIN, b.CHECKOUT FROM BOOKED_ROOMS br INNER JOIN ROOMS r ON br.ROOM_ID = r.ID INNER JOIN ROOM_TYPE t ON r.ROOM_TYPE = t.ID INNER JOIN BOOKINGS b ON br.BOOKING_ID = b.ID;")
+            
+            data: list[dict[str, Any]] = list(map(
+                    lambda row: {
+                        "id": row[0],
+                        "name": row[1],
+                        "type": row[2],
+                        "price": row[3],
+                        "customer": row[4],
+                        "email": row[5],
+                        "checkin": row[6],
+                        "checkout": row[7]
+                    },
+                    result.fetchall()
+            ))
+
+            return {
+                "data": data
+            }
+        except Exception as err:
+            print(err)
+            return {
+                "data": {},
+                "status": "ERROR - Execution failed."
+            }
+
 @app.get("/rooms")
 def rooms() -> dict[str, Any]:
-    with sqlite3.connect("data.db") as con:
+    with sqlite3.connect("mnt/data.db") as con:
         try:
             cur: sqlite3.Cursor = con.cursor()
             result: sqlite3.Cursor = cur.execute(
@@ -58,7 +95,7 @@ def check() -> dict[str, Any]:
             "status": "ERROR - Not enough data."
         }
 
-    with sqlite3.connect("data.db") as con:
+    with sqlite3.connect("mnt/data.db") as con:
         try:
             cur: sqlite3.Cursor = con.cursor()
             result: sqlite3.Cursor = cur.execute(
@@ -132,7 +169,7 @@ def book() -> dict[str, Any]:
             "status": "ERROR - Not enough data."
         }
 
-    with sqlite3.connect("data.db") as con:
+    with sqlite3.connect("mnt/data.db") as con:
         try:
             cur: sqlite3.Cursor = con.cursor()
             vacant: sqlite3.Cursor = cur.execute(
