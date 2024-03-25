@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Sample Frontend</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: sans-serif;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 16px;
+
+            background-color: #333;
+            color: bisque;
+        }
+
+        .container {
+            display: flex;
+            flex-flow: column;
+            justify-content: center;
+            align-items: stretch;
+        }
+
+        .container>* {
+            margin-block: 8px;
+            padding: 8px;
+            border-radius: 8px;
+        }
+
+        button {
+            background-color: cadetblue;
+            color: azure;
+            padding: 8px;
+            border-radius: 8px;
+            min-width: 64px;
+            display: inline-block;
+            font-family: monospace;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Booking</h1>
+    <div class="container">
+        <label for="name">Name:</label>
+        <input type="text" id="name">
+        <label for="email">Email:</label>
+        <input type="email" id="email">
+        <label for="room-type">Choose a room type:</label>
+        <select name="room-type" id="room-type">
+            <option value="1">STANDARD</option>
+            <option value="2">EXECUTIVE</option>
+            <option value="3">DAY STAY</option>
+            <option value="4">LONG STAY</option>
+        </select>
+        <label for="amount">Room Amount:</label>
+        <input type="number" min="0" max="10" id="amount" value="0">
+        <label for="checkin">Check-in:</label>
+        <input type="datetime-local" id="checkin">
+        <label for="checkout">Check-out:</label>
+        <input type="datetime-local" id="checkout">
+
+        <button onclick="check()">CHECK AVAILABLE</button>
+        <button onclick="book()">BOOK ROOMS</button>
+    </div>
+    </div>
+
+    <script>
+        let name = document.querySelector("#name");
+        let email = document.querySelector("#email");
+        let type = document.querySelector("#room-type");
+        let amount = document.querySelector("#amount");
+        let checkin = document.querySelector("#checkin");
+        let checkout = document.querySelector("#checkout");
+
+        function validate() {
+            if (name.value == "" || email.value == "" || !checkin.value || !checkout.value) {
+                alert("Fill in all the values.");
+                return false;
+            }
+
+            return true;
+        }
+
+        async function check() {
+            if (validate()) {
+                let data = {
+                    "type": type.value,
+                    "amount": parseInt(amount.value),
+                    "checkin": checkin.value.replace("T", " "),
+                    "checkout": checkout.value.replace("T", " ")
+                };
+
+                let available = await fetch("https://test-edc-hotel-api.fly.dev/check", {
+                    method: "POST",
+                    mode: "cors",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(data),
+                }).then(res => {
+                    if (res.ok) {
+                        return res.json();
+                    } else {
+                        return {};
+                    }
+                });
+
+                if (available) {
+                    console.log(available);
+                    alert(available.data.available);
+                }
+            }
+        }
+
+        async function book() {
+            if (validate()) {
+                let data = {
+                    "email": email.value,
+                    "name": name.value,
+                    "type": type.value,
+                    "amount": parseInt(amount.value),
+                    "checkin": checkin.value.replace("T", " "),
+                    "checkout": checkout.value.replace("T", " ")
+                };
+
+                let booking_result = await fetch("https://test-edc-hotel-api.fly.dev/book", {
+                    method: "POST",
+                    mode: "cors",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(data),
+                }).then(res => {
+                    if (res.ok) {
+                        return res.json();
+                    } else {
+                        return {};
+                    }
+                });
+
+                if (booking_result) {
+                    console.log(booking_result);
+
+                    if (booking_result.data.status == "SUCCESS") {
+                        alert("Booking Successful: RM" + booking_result.data.total);
+                    } else {
+                        alert("Booking failed.");
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

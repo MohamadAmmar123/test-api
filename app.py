@@ -31,7 +31,8 @@ def rooms() -> dict[str, Any]:
             return {
                 "data": data
             }
-        except:
+        except Exception as err:
+            print(err)
             return {
                 "data": {},
                 "status": "ERROR - Execution failed."
@@ -50,7 +51,8 @@ def check() -> dict[str, Any]:
         room_amount = request.json["amount"]
         checkin_date = request.json["checkin"]
         checkout_date = request.json["checkout"]
-    except:
+    except Exception as err:
+        print(err)
         return {
             "data": {},
             "status": "ERROR - Not enough data."
@@ -100,7 +102,8 @@ def check() -> dict[str, Any]:
                 }
             }
         
-        except:
+        except Exception as err:
+            print(err)
             return {
                 "data": {},
                 "status": "ERROR - Execution failed."
@@ -122,7 +125,8 @@ def book() -> dict[str, Any]:
         name = request.json["name"]
         checkin_date = request.json["checkin"]
         checkout_date = request.json["checkout"]
-    except:
+    except Exception as err:
+        print(err)
         return {
             "data": {},
             "status": "ERROR - Not enough data."
@@ -224,7 +228,8 @@ def book() -> dict[str, Any]:
                     }
                 }
         
-        except:
+        except Exception as err:
+            print(err)
             return {
                 "data": {},
                 "status": "ERROR - Execution failed."
