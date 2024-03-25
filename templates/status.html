@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>API Status</title>
+        <style>
+            * {
+                box-sizing: border-box;
+                font-family: sans-serif;
+            }
+
+            html, body {
+                margin: 0;
+                padding: 16px;
+
+                background-color: #333;
+                color: bisque;
+            }
+
+            .url {
+                background-color: cadetblue;
+                color: azure;
+                padding: 8px;
+                border-radius: 8px;
+                min-width: 64px;
+                display: inline-block;
+                font-family: monospace;
+                text-decoration: none;
+                font-weight: bold;
+            }
+
+            .param {
+                color: cadetblue;
+                font-family: monospace;
+            }
+
+            li {
+                margin-block: 4px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>API Status</h1>
+        <p>If you can view this page, the API is running properly.</p>
+        <h2>Endpoints</h2>
+        <h3>GET:</h3>
+        <ul>
+            <li><a class="url" href="/">/</a> : View this page.</li>
+            <li><a class="url" href="/rooms">/rooms</a> : Get the list of rooms.</li>
+        </ul>
+        <h3>POST:</h3>
+        <ul>
+            <li><a class="url" href="/check">/check</a> : Check availability of rooms. (<span class="param">type: int, amount: int, checkin: str, checkout: str</span>)</li>
+            <li><a class="url" href="/book">/book</a> : Book available rooms. (<span class="param">email: str, name: str, type: int, amount: int, checkin: str, checkout: str</span>)</li>
+        </ul>
+    </body>
+</html>
